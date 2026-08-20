@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { GlowCard } from '@/components/ui/GlowCard';
 import { toast } from 'sonner';
 import { useMode } from '@/contexts/ModeContext';
-import { YouTubeModal } from '@/components/dashboard/SideHustle/YouTubeModal';
 import { API_BASE_URL } from '@/lib/api';
 
 interface TodoItem {
@@ -30,8 +29,6 @@ export function AssignmentUpload() {
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [assignmentData, setAssignmentData] = useState<AssignmentResponse | null>(null);
-    const [selectedVideoTopic, setSelectedVideoTopic] = useState<string | null>(null);
-    const [selectedVideoSubject, setSelectedVideoSubject] = useState<string>('Education');
 
     // Load latest assignment on mount
     useEffect(() => {
@@ -241,19 +238,7 @@ export function AssignmentUpload() {
                                                     <p className={`text-sm font-medium leading-relaxed mb-2 transition-all duration-300 ${isCompleted ? 'text-muted-foreground line-through decoration-primary/50' : 'text-foreground'}`}>
                                                         {todo.task}
                                                     </p>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setSelectedVideoTopic(todo.task);
-                                                            setSelectedVideoSubject("Education");
-                                                        }}
-                                                        className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 shrink-0"
-                                                        title="Watch related videos"
-                                                    >
-                                                        <Youtube className="h-4 w-4" />
-                                                    </Button>
+
                                                 </div>
 
                                                 <div className="flex flex-wrap items-center gap-2 text-[11px]">
@@ -294,12 +279,7 @@ export function AssignmentUpload() {
                 </AnimatePresence>
             </div>
 
-            <YouTubeModal
-                isOpen={!!selectedVideoTopic}
-                onClose={() => setSelectedVideoTopic(null)}
-                topic={selectedVideoTopic || ""}
-                subject={selectedVideoSubject}
-            />
+
         </div>
     );
 }

@@ -2,7 +2,6 @@
 
 import { ReactNode } from 'react';
 import { Sidebar } from './Sidebar';
-import { ModeToggle } from './ModeToggle';
 import { motion } from 'framer-motion';
 import { useMode } from '@/contexts/ModeContext';
 import { usePathname } from 'next/navigation';
@@ -18,8 +17,7 @@ export function DashboardLayout({ children, title, subtitle }: DashboardLayoutPr
   const pathname = usePathname();
   const isTeacher = userProfile?.role === 'teacher';
   
-  // Hide mode toggle on certain pages where it doesn't make sense or breaks context
-  const hideModeToggle = pathname?.startsWith('/tutor') || pathname?.startsWith('/classrooms');
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,8 +37,6 @@ export function DashboardLayout({ children, title, subtitle }: DashboardLayoutPr
                 <p className="text-sm text-muted-foreground">{subtitle}</p>
               )}
             </motion.div>
-            {/* Only show mode toggle for students on allowed pages */}
-            {!isTeacher && !hideModeToggle && <ModeToggle />}
           </div>
         </header>
 

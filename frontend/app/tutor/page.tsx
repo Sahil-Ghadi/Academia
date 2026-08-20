@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { Send, BrainCircuit, GraduationCap, FileQuestion, Volume2, VolumeX, Loader2, Sparkles, Layers, Maximize2, X, MessageSquareText } from 'lucide-react';
 import { useMode } from '@/contexts/ModeContext';
-import { useGamification } from '@/contexts/GamificationContext';
 import { API_BASE_URL } from '@/lib/api';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { toast } from 'sonner';
@@ -157,7 +156,6 @@ function RobotAvatar({ isSpeaking, isThinking, tutorMode }: {
 // ────────────────────────────────────────────────────────
 export default function TutorPage() {
     const { user } = useMode();
-    const { awardXP } = useGamification();
     const [tutorMode, setTutorMode] = useState<TutorMode>('explain');
     const [messages, setMessages] = useState<Message[]>([]);
     const [historyLoaded, setHistoryLoaded] = useState(false);
@@ -348,7 +346,6 @@ export default function TutorPage() {
                 visualizable: isExplainMode && isSubstantial,
             }]);
             speakText(data.response);
-            awardXP('tutor_session');
         } catch {
             toast.error('AI Engine unreachable. Please ensure the backend is running.');
         } finally {

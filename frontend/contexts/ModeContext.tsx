@@ -7,14 +7,13 @@ import { auth, db } from '@/lib/firebase';
 import { toast } from 'sonner';
 import { API_BASE_URL } from '@/lib/api';
 
-export type LearningMode = 'academic' | 'side-hustle';
+export type LearningMode = 'academic';
 
 interface UserProfile {
   name: string;
   college: string;
   course: string;
   academicSubjects: string[];
-  sideHustleInterests: string[];
   onboarded: boolean;
   role?: string;
   classroom_id?: string;
@@ -40,7 +39,6 @@ const defaultProfile: UserProfile = {
   college: '',
   course: '',
   academicSubjects: [],
-  sideHustleInterests: [],
   onboarded: false,
 };
 
@@ -89,7 +87,6 @@ export function ModeProvider({ children }: { children: ReactNode }) {
               college: data.college,
               course: data.course,
               academicSubjects: data.academic_subjects || [],
-              sideHustleInterests: data.side_hustle_interests || [],
               onboarded: data.onboarded,
               role: data.role || "student",
               classroom_id: data.classroom_id
@@ -223,19 +220,8 @@ export function ModeProvider({ children }: { children: ReactNode }) {
     }
   }, [userProfile, user]);
 
-  // Apply mode class to document
-  useEffect(() => {
-    const root = document.documentElement;
-    if (mode === 'side-hustle') {
-      root.classList.add('side-hustle-mode');
-    } else {
-      root.classList.remove('side-hustle-mode');
-    }
-  }, [mode]);
-
   const toggleMode = () => {
-    if (isCrunchMode) return;
-    setMode(prev => prev === 'academic' ? 'side-hustle' : 'academic');
+    // Mode toggle disabled
   };
 
   const isOnboarded = userProfile?.onboarded ?? false;

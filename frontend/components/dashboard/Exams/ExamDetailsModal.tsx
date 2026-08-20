@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { API_BASE_URL } from '@/lib/api';
 import { AssessmentModal } from './AssessmentModal';
-import { YouTubeModal } from '@/components/dashboard/SideHustle/YouTubeModal';
 
 interface ExamDetailsModalProps {
     isOpen: boolean;
@@ -20,8 +19,6 @@ interface ExamDetailsModalProps {
 
 export function ExamDetailsModal({ isOpen, onClose, exam, onUpdate }: ExamDetailsModalProps) {
     const { user } = useMode();
-    const [selectedVideoTopic, setSelectedVideoTopic] = useState<string | null>(null);
-    const [selectedVideoSubject, setSelectedVideoSubject] = useState<string>("General");
     const [showAssessment, setShowAssessment] = useState(false);
     const [localSyllabus, setLocalSyllabus] = useState<any[]>([]);
 
@@ -256,18 +253,7 @@ export function ExamDetailsModal({ isOpen, onClose, exam, onUpdate }: ExamDetail
                                                         </span>
                                                     </div>
 
-                                                    {!topic.completed && (
-                                                        <button
-                                                            onClick={() => {
-                                                                setSelectedVideoTopic(topic.name);
-                                                                setSelectedVideoSubject(exam.subject || "General");
-                                                            }}
-                                                            title="Watch tutorial"
-                                                            className="shrink-0 ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100"
-                                                        >
-                                                            <PlayCircle className="h-4 w-4" />
-                                                        </button>
-                                                    )}
+
                                                 </motion.div>
                                             ))}
                                         </div>
@@ -286,12 +272,7 @@ export function ExamDetailsModal({ isOpen, onClose, exam, onUpdate }: ExamDetail
                 onUpdate={onUpdate}
             />
 
-            <YouTubeModal
-                isOpen={!!selectedVideoTopic}
-                onClose={() => setSelectedVideoTopic(null)}
-                topic={selectedVideoTopic || ""}
-                subject={selectedVideoSubject}
-            />
+
         </>
     );
 }

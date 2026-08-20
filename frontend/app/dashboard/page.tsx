@@ -3,7 +3,6 @@
 import { AnimatePresence } from 'framer-motion';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { AcademicDashboard } from '@/components/dashboard/AcademicDashboard';
-import { SideHustleDashboard } from '@/components/dashboard/SideHustleDashboard';
 import { useMode } from '@/contexts/ModeContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -36,15 +35,11 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout
-      title={mode === 'academic' ? '🎓 Academic Dashboard' : '🚀 Side Hustle Dashboard'}
+      title="🎓 Academic Dashboard"
       subtitle={`Welcome back, ${userProfile?.name || 'Student'}! Here's your AI-optimized learning plan.`}
     >
       <AnimatePresence mode="wait">
-        {mode === 'academic' ? (
-          <AcademicDashboard />
-        ) : (
-          <SideHustleDashboard />
-        )}
+        <AcademicDashboard />
       </AnimatePresence>
     </DashboardLayout>
   );

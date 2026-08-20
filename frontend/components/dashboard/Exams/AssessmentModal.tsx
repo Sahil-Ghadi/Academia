@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useMode } from "@/contexts/ModeContext";
-import { useGamification } from "@/contexts/GamificationContext";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { API_BASE_URL } from "@/lib/api";
@@ -33,7 +32,6 @@ interface AssessmentModalProps {
 
 export function AssessmentModal({ isOpen, onClose, exam, onUpdate }: AssessmentModalProps) {
   const { user } = useMode();
-  const { awardXP } = useGamification();
   const [step, setStep] = useState<"intro" | "quiz" | "result" | "analysis">("intro");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -131,12 +129,6 @@ export function AssessmentModal({ isOpen, onClose, exam, onUpdate }: AssessmentM
       setResult(resultData);
       setStep("result");
       onUpdate();
-      // Award XP — ace bonus for 100%
-      if (resultData.accuracy >= 100) {
-        awardXP('assessment_ace', 'ace');
-      } else {
-        awardXP('assessment_complete');
-      }
     } catch {
       toast.error("Failed to submit results");
     } finally {

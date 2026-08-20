@@ -24,7 +24,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useMode } from '@/contexts/ModeContext';
 import { AssignmentUpload } from '@/components/dashboard/AssignmentUpload';
 import { useRouter } from 'next/navigation';
-import { SideHustleInsights } from '@/components/dashboard/SideHustleInsights';
 import { API_BASE_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -50,7 +49,7 @@ function TrendBadge({ trend }: { trend: string }) {
 }
 
 export default function InsightsPage() {
-    const { user, mode, isLoading, isOnboarded } = useMode();
+    const { user, isLoading, isOnboarded } = useMode();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('Overview');
     const [aiSummary, setAiSummary] = useState<string | null>(null);
@@ -122,12 +121,9 @@ export default function InsightsPage() {
 
     return (
         <DashboardLayout
-            title={mode === 'side-hustle' ? "Side Hustle Metrics" : "Deep Insights"}
-            subtitle={mode === 'side-hustle' ? "Track your practical skill building progress" : "Detailed performance metrics and AI analysis."}
+            title="Deep Insights"
+            subtitle="Detailed performance metrics and AI analysis."
         >
-            {mode === 'side-hustle' ? (
-                <SideHustleInsights />
-            ) : (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -413,7 +409,6 @@ export default function InsightsPage() {
                         </GlowCard>
                     </div>
                 </motion.div>
-            )}
         </DashboardLayout>
     );
 }

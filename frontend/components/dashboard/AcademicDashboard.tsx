@@ -11,7 +11,6 @@ import { UpcomingDeadlines } from '@/components/UpcomingDeadlines';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useMode } from '@/contexts/ModeContext';
-import { useGamification } from '@/contexts/GamificationContext';
 import { MasteryRadarChart } from './MasteryRadarChart';
 import { MultilingualAITutor } from './MultilingualAITutor';
 import { API_BASE_URL } from '@/lib/api';
@@ -22,7 +21,6 @@ import { AssessmentModal } from './Exams/AssessmentModal';
 
 export function AcademicDashboard() {
   const { user, refreshTrigger } = useMode();
-  const { awardXP } = useGamification();
 
   // Mastery Data
   const [masteryData, setMasteryData] = useState<{ subject: string; elo: number; fullMark: number }[]>([]);

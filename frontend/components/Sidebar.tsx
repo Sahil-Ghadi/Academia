@@ -19,16 +19,13 @@ import {
 } from 'lucide-react';
 import { useMode } from '@/contexts/ModeContext';
 import { cn } from '@/lib/utils';
-import { SidebarXPWidget } from '@/components/SidebarXPWidget';
 
 const navItems = [
   // Student-only routes (academic order)
   { path: '/dashboard',        label: 'Dashboard',       icon: LayoutDashboard, role: 'student' },
-  { path: '/tutor',            label: 'AI Tutor',        icon: Bot,             role: 'student', hideInSideHustle: true },
-  { path: '/classrooms',       label: 'Classrooms',      icon: School,          role: null,      hideInSideHustle: true },
-  { path: '/dashboard/skills', label: 'Progress & XP',  icon: Trophy,          role: 'student' },
+  { path: '/tutor',            label: 'AI Tutor',        icon: Bot,             role: 'student' },
+  { path: '/classrooms',       label: 'Classrooms',      icon: School,          role: null },
   { path: '/insights',         label: 'Insights',        icon: Brain,           role: 'student' },
-  { path: '/timeline',         label: 'Agent Timeline',  icon: Activity,        role: 'student' },
   // Teacher-only
   { path: '/teacher',          label: 'Teacher Dashboard', icon: GraduationCap, role: 'teacher' },
   // Shared — always last
@@ -40,7 +37,6 @@ export function Sidebar() {
   const { mode, userProfile, isCrunchMode, crucialExam } = useMode();
 
   const isTeacher = userProfile?.role === 'teacher';
-  const ModeIcon = mode === 'academic' ? GraduationCap : Rocket;
 
   return (
     <motion.aside
@@ -69,14 +65,14 @@ export function Sidebar() {
             {isCrunchMode ? (
               <Lock className="h-5 w-5 text-red-500" />
             ) : (
-              <ModeIcon className="h-5 w-5 text-primary" />
+              <GraduationCap className="h-5 w-5 text-primary" />
             )}
             <div>
               <p className={cn("text-xs", isCrunchMode ? "text-red-500 font-bold" : "text-muted-foreground")}>
                 {isCrunchMode ? "CRITICAL" : "Current Mode"}
               </p>
               <p className="font-medium capitalize truncate max-w-[140px]">
-                {isCrunchMode ? "Crunch Mode" : (mode === 'academic' ? 'Academic' : 'Side Hustle')}
+                {isCrunchMode ? "Crunch Mode" : "Academic"}
               </p>
             </div>
           </div>
@@ -100,7 +96,6 @@ export function Sidebar() {
       <nav className="flex-1 space-y-1 p-4">
         {navItems
           .filter(item => item.role === null || item.role === userProfile?.role)
-          .filter(item => !(item as any).hideInSideHustle || mode !== 'side-hustle')
           .map((item) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
@@ -123,10 +118,7 @@ export function Sidebar() {
           })}
       </nav>
 
-      {/* XP Widget — students only */}
-      {!isTeacher && (
-        <SidebarXPWidget />
-      )}
+
 
       {/* User Profile */}
       {userProfile && (

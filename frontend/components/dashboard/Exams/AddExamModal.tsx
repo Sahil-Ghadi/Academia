@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMode } from '@/contexts/ModeContext';
-import { useGamification } from '@/contexts/GamificationContext';
 import { toast } from 'sonner';
 import { API_BASE_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -22,7 +21,6 @@ interface AddExamModalProps {
 
 export function AddExamModal({ isOpen, onClose, onSuccess }: AddExamModalProps) {
     const { user, userProfile } = useMode();
-    const { awardXP } = useGamification();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ subject: '', title: '', date: '', syllabus: '' });
 
@@ -49,7 +47,6 @@ export function AddExamModal({ isOpen, onClose, onSuccess }: AddExamModalProps) 
 
             if (!response.ok) throw new Error('Failed to create exam');
             toast.success('Exam added!');
-            awardXP('exam_created');
             onSuccess();
             onClose();
             setFormData({ subject: '', title: '', date: '', syllabus: '' });
