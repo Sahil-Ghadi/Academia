@@ -482,3 +482,67 @@ async def get_visualization(request: VisualizeRequest):
                 }
             ]
         }
+
+
+# ─────────────────────────────────────────────────────────
+# Doubt Solver endpoint — Grounded in textbooks / Wikipedia
+# ─────────────────────────────────────────────────────────
+
+class DoubtRequest(BaseModel):
+    uid: str
+    doubt: str
+    textbook_name: str
+    language: str = "English"
+
+@tutor_router.post("/doubt_solver")
+async def solve_doubt(request: DoubtRequest):
+    try:
+        from utils.search_tools import search_textbook_concept
+        from langgraph.prebuilt import create_react_agent
+        from langchain_core.messages import SystemMessage, HumanMessage
+
+        doubt_tools = [search_textbook_concept]
+        doubt_agent = create_react_agent(llm, doubt_tools)
+        
+        system_prompt = f"""You are a Grounded Doubt-Solving AI Tutor.
+Your goal is to explain concepts step-by-step to a student.
+The student has asked a doubt based on the textbook/context: '{request.textbook_name}'.
+Language to respond in: {request.language}
+
+Instructions:
+1. You MUST use the `search_textbook_concept` tool to fetch accurate information regarding the student's doubt from Wikipedia, prioritizing the textbook context if available.
+2. Explain the concept step-by-step in {request.language}. Keep it clear, engaging, and academic.
+3. You MUST provide citations at the end of your response indicating where you sourced the information (e.g., specific Wikipedia pages or textbook references you found).
+4. Do not hallucinate facts. If the tool does not provide enough information, state that clearly in {request.language}.
+"""
+
+        inputs = {
+            "messages": [
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=request.doubt),
+            ]
+        }
+
+        result = await doubt_agent.ainvoke(inputs)
+        last_message = result["messages"][-1]
+        response_text = last_message.content
+
+        # Log timeline event
+        try:
+            from utils.timeline_logger import log_timeline_event
+            await log_timeline_event(
+                uid=request.uid,
+                type="insight",
+                title="Doubt Resolved",
+                description=f"Topic: {request.textbook_name}",
+                icon="Lightbulb",
+                details=[f"Doubt: {request.doubt[:50]}...", f"Language: {request.language}"],
+                mode="academic"
+            )
+        except Exception:
+            pass
+
+        return {"response": response_text}
+    except Exception as e:
+        print(f"Error in solve_doubt: {e}")
+        return {"response": f"Sorry, an error occurred while solving your doubt: {str(e)}"}

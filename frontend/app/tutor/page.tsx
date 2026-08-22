@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DashboardLayout } from '@/components/DashboardLayout';
-import { Send, BrainCircuit, GraduationCap, FileQuestion, Volume2, VolumeX, Loader2, Sparkles, Layers, Maximize2, X, MessageSquareText } from 'lucide-react';
+import { Send, BrainCircuit, GraduationCap, FileQuestion, Volume2, VolumeX, Loader2, Sparkles, Layers, Maximize2, X, MessageSquareText, BookOpen } from 'lucide-react';
 import { useMode } from '@/contexts/ModeContext';
 import { API_BASE_URL } from '@/lib/api';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { VisualizationPanel } from '@/components/tutor/VisualizationPanel';
 
-type TutorMode = 'explain' | 'exam_prep';
+type TutorMode = 'explain' | 'exam_prep' | 'doubt_solver';
 
 interface MCQ {
     question: string;
@@ -167,6 +167,10 @@ export default function TutorPage() {
     const [isVizExpanded, setIsVizExpanded] = useState(false);
     const [examActive, setExamActive] = useState(false); // tracks if rapid-fire MCQ loop is running
 
+    // Doubt Solver State
+    const [textbookName, setTextbookName] = useState('Physics by Halliday');
+    const [language, setLanguage] = useState('English');
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const synthRef = useRef<SpeechSynthesis | null>(null);
 
@@ -229,6 +233,7 @@ export default function TutorPage() {
     const modes = {
         explain:   { label: 'Deep Explain', color: '#3b82f6', bg: 'from-blue-600 to-cyan-500', sub: 'Adaptive Analogies'  },
         exam_prep: { label: 'Exam Simulator',color: '#f43f5e', bg: 'from-rose-600 to-orange-500', sub: 'Rapid Recall'     },
+        doubt_solver: { label: 'Doubt Solver', color: '#10b981', bg: 'from-emerald-600 to-teal-500', sub: 'Grounded Citations' },
     };
     const current = modes[tutorMode];
 
@@ -329,11 +334,20 @@ export default function TutorPage() {
         setIsTyping(true);
         synthRef.current?.cancel(); setIsSpeaking(false);
         try {
-            const res = await fetch(`${API_BASE_URL}/tutor/message`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ uid: user.uid, message: userMsg, mode: tutorMode, session_id: 'tutor_session' }),
-            });
+            let res;
+            if (tutorMode === 'doubt_solver') {
+                res = await fetch(`${API_BASE_URL}/tutor/doubt_solver`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: user.uid, doubt: userMsg, textbook_name: textbookName, language: language }),
+                });
+            } else {
+                res = await fetch(`${API_BASE_URL}/tutor/message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: user.uid, message: userMsg, mode: tutorMode, session_id: 'tutor_session' }),
+                });
+            }
             if (!res.ok) throw new Error();
             const data = await res.json();
             const isExplainMode = tutorMode === 'explain';
@@ -427,6 +441,7 @@ export default function TutorPage() {
                             {([
                                 { id: 'explain',   Icon: GraduationCap, label: 'Deep Explain',  color: '#3b82f6', bg: 'bg-blue-500' },
                                 { id: 'exam_prep', Icon: FileQuestion,  label: 'Exam Simulator',color: '#f43f5e', bg: 'bg-rose-500' },
+                                { id: 'doubt_solver', Icon: BookOpen,   label: 'Doubt Solver',  color: '#10b981', bg: 'bg-emerald-500' },
                             ] as const).map(({ id, Icon, label, color, bg }) => (
                                 <button key={id} onClick={() => handleModeChange(id)}
                                     className={cn('flex items-center gap-3 p-3 rounded-2xl transition-all text-left w-full relative overflow-hidden group',
@@ -619,6 +634,31 @@ export default function TutorPage() {
                                     </motion.div>
                                 )}
                             </AnimatePresence>
+
+                            {tutorMode === 'doubt_solver' && (
+                                <div className="mb-3 flex flex-wrap gap-3">
+                                    <input 
+                                        type="text" 
+                                        value={textbookName} 
+                                        onChange={e => setTextbookName(e.target.value)} 
+                                        placeholder="Textbook Name (e.g. Physics by Halliday)" 
+                                        className="flex-1 bg-background border border-border/80 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500" 
+                                    />
+                                    <select 
+                                        value={language} 
+                                        onChange={e => setLanguage(e.target.value)}
+                                        className="bg-background border border-border/80 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-500 appearance-none"
+                                    >
+                                        <option value="English">English</option>
+                                        <option value="Spanish">Spanish</option>
+                                        <option value="French">French</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="German">German</option>
+                                        <option value="Mandarin">Mandarin</option>
+                                    </select>
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit} className="relative flex items-center">
                                 <input value={input} onChange={e => setInput(e.target.value)} disabled={isTyping}
                                     placeholder={isTyping ? 'Engine is processing...' : 'Type your query here...'}
